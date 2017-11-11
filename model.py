@@ -1,44 +1,65 @@
 import keras
 from keras.models import Sequential
-from keras.layers import Conv2D, Conv3D, Activation
-from keras.optimizers import RMSProp
+from keras.layers import Conv2D, Conv3D, Activation, Reshape, Flatten, Dense
+from keras.optimizers import RMSprop
+from keras.callbacks import ModelCheckpoint
 
 import numpy as np
 
+from manage_data import load_dataset
+import drugs
+
 
 class FramePredictor:
-	def __init__(self, n_input_frames=3, activation_type='relu'):
-		self.n_input_frames = n_input_frames
+	def __init__(self, activation_type='elu'):
 		self.activation_type = activation_type
 		self.batch_size = 64
-		self.name = f'{self.n_input_frames}_i_f_{self.activation_type}.h5'
 		self.drug = 'none'
+		self.X, self.Y = load_dataset()
+		self.save_path = 'weights/frame_predictor_weights_dropout.hdf5'
+
+		print(self.X.shape)
+		print(self.Y.shape)
 
 	def create_model(self):
 		model = Sequential()
-		model.add(Conv3D(128, (1, 3, 3), padding='same', input_shape=self.x_train[1:]))
+		model.add(Conv3D(32, (3, 3, 3), padding='same', input_shape=self.X.shape[1:]))
 		model.add(Activation(self.activation_type))
-		model.add(Conv3D(128, (1, 3, 3)))
+		model.add(Dropout(0.25))
+		model.add(Conv3D(32, (3, 3, 3), padding='same'))
 		model.add(Activation(self.activation_type))
-		model.add(Conv3D(128, (1, 3, 3)))
-		model.add(Activation(self.activation_type))		
+		model.add(Dropout(0.25))
+		model.add(Conv3D(32, (3, 3, 3), padding='same'))
+		model.add(Activation(self.activation_type))
+		model.add(Dropout(0.25))
+		model.add(Conv3D(32, (3, 3, 3), padding='same'))
+		model.add(Activation(self.activation_type))
+		model.add(Dropout(0.25))
+		model.add(Conv3D(1, (3, 3, 3), padding='same'))
+		model.add(Activation(self.activation_type))
+		model.add(Reshape(self.Y.shape[1:]))
 		model.compile(
 			loss='mse',
-			optimizer=RMSProp(),
+			optimizer=RMSprop(),
 		)
 		self.model = model
 
 	def train_model(self, epochs=200):
+		checkpointer = ModelCheckpoint(
+			filepath=self.save_path,
+			verbose=1,
+			save_best_only=True)
 		self.model.fit(
-			x=self.x_train,
-			y=self.y_train,
+			x=self.X,
+			y=self.Y,
 			validation_split=0.1,
 			batch_size=self.batch_size,
-			epochs=epochs)
-		self.model.save_weights('weights/' + self.name)
+			shuffle=True,
+			epochs=epochs,
+			callbacks=[checkpointer])
 
 	def load_model(self):
-		self.model.load_weights(self.name)
+		self.model.load_weights(self.save_path)
 		self.clean_model = model
 
 	def give_drug(self, drug):
@@ -48,5 +69,5 @@ class FramePredictor:
 		self.model = self.clean_model
 
 	def predict(self, frames):
-		pass
+		return self.model.predict(frames)
 
