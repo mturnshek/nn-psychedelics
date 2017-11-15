@@ -1,0 +1,44 @@
+frame_predictor_weights.hdf5
+
+model = Sequential()
+model.add(Conv3D(64, (3, 3, 3), padding='same', input_shape=self.X.shape[1:]))
+model.add(Activation(self.activation_type))
+model.add(Conv3D(64, (3, 3, 3), padding='same'))
+model.add(Activation(self.activation_type))
+model.add(Conv3D(64, (3, 3, 3), padding='same'))
+model.add(Activation(self.activation_type))
+model.add(Conv3D(64, (3, 3, 3), padding='same'))
+model.add(Activation(self.activation_type))
+model.add(Conv3D(3, (3, 3, 3), strides=(3, 1, 1), padding='same'))
+model.add(Reshape(self.Y.shape[1:]))
+model.add(Activation(self.activation_type))
+
+
+--------
+
+frame_predictor_weights_2.hdf5
+
+model = Sequential()
+model.add(Conv3D(64, (3, 3, 3), padding='same', input_shape=self.X.shape[1:]))
+model.add(Activation(self.activation_type))
+model.add(Conv3D(64, (3, 3, 3), padding='same'))
+model.add(Activation(self.activation_type))
+model.add(Conv3D(64, (3, 3, 3), padding='same'))
+model.add(Activation(self.activation_type))
+model.add(Conv3D(64, (3, 3, 3), padding='same'))
+model.add(Activation(self.activation_type))
+model.add(Conv3D(3, (3, 3, 3), strides=(3, 1, 1), padding='same'))
+model.add(Activation(self.activation_type))
+model.add(Reshape(self.Y.shape[1:]))
+model.add(Conv2DTranspose(3, (3, 3), padding='same'))
+model.add(Activation(self.activation_type))
+
+
+--------
+
+frame_predictor_weights_3.hdf5
+
+same as 1, but with train_far_predictor
+
+
+--------
