@@ -6,7 +6,7 @@ Assumes the model receives the 3 prior frames
 to make its prediction for the following frame
 """
 
-DATA_PATH = 'D:/datasets/drugs/' # give absolute path
+DATA_PATH = 'frame_sequence_data/' # give absolute path
 
 
 def flatten(list_of_lists):
@@ -37,10 +37,10 @@ def get_usable_dataset_from_file(filename):
 
 def load_dataset():
 	"""
-	Load all files in the 'data' directory into a single array.
+	Load all files in the 'frame_sequence_data' directory into a single array.
 	Assumes:
 		they're all numpy array files with color frame data
-		e.g. an array of shape (1233, 110, 127, 3)
+		(in this case, they are arrays of shape (n, 110, 127, 3,))
 		the shapes are the same past the first dimension
 	"""
 	files = os.listdir(os.path.abspath(DATA_PATH))

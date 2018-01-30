@@ -1,21 +1,11 @@
 import pygame
 import numpy as np
 import sys
-import keyboard
 import time
 import scipy.misc
+import keyboard
 
 from model import FramePredictor
-from drugs import caffeine, lsd, shrooms
-
-"""
-Shows the effects of drugs and allow the user to
-switch between them with different button presses
-e.g.
-1	:	clean
-2	: 	caffiene
-etc ..
-"""
 
 # Initialize FramePredictor model
 frame_predictor = FramePredictor(load_weights=True)
@@ -32,7 +22,7 @@ speed = 0.05 # show 20fps
 i = 0
 while True:
 	frames = X[i]
-	if frame_predictor.on_shrooms:
+	if frame_predictor.predict_next_frame_mode:
 		frames = frame_predictor.predicted_frame_buffer
 	prediction = frame_predictor.predict(frames)
 	prediction = scipy.misc.imresize(prediction, (440, 508))
@@ -46,16 +36,10 @@ while True:
 			sys.exit()
 
 		if keyboard.is_pressed('1'):
-			frame_predictor.rehab()
+			frame_predictor.predict_next_frame_mode = True
 
 		if keyboard.is_pressed('2'):
-			frame_predictor.give_drug(caffeine)
-
-		if keyboard.is_pressed('3'):
-			frame_predictor.give_drug(lsd)
-
-		if keyboard.is_pressed('4'):
-			frame_predictor.give_drug(shrooms)
+			frame_predictor.predict_next_frame_mode = False
 
 	i += 1
 	if i == len(X):

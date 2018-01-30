@@ -7,7 +7,6 @@ from keras.callbacks import ModelCheckpoint
 import numpy as np
 
 from manage_data import load_dataset
-import drugs
 
 class FramePredictor:
 	def __init__(self, activation_type='elu', load_weights=False):
@@ -15,8 +14,7 @@ class FramePredictor:
 		self.batch_size = 64
 		self.save_path = 'weights/frame_predictor_weights.hdf5'
 
-		# drugs settings
-		self.on_shrooms = False
+		self.predict_next_frame_mode = False
 
 		if load_weights:
 			self.load_data()
@@ -68,16 +66,7 @@ class FramePredictor:
 	def load_model(self):
 		self.model.load_weights(self.save_path)
 
-	def give_drug(self, drug):
-		self = drug(self)
-
-	def rehab(self):
-		self.create_model()
-		self.load_model()
-		self.on_shrooms = False
-
 	def predict(self, frames):
 		prediction = self.model.predict(np.array([frames]))[0]
 		self.add_frame_to_predicted_frame_buffer(prediction)
 		return prediction
-
